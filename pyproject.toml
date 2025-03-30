@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "pyvuebot"
+version = "0.1.0"
+description = "CLI tool for Telegram Mini Apps"
+authors = ["Gemechis Chala <venopyx@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+click = "^8.0.0"
+
+[tool.poetry.scripts]
+pyvuebot = "pyvuebot.cli:cli"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
