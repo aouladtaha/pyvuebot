@@ -1,0 +1,12 @@
+pyvuebot/
+├── pyvuebot/
+│   ├── __init__.py
+│   ├── cli.py
+│   ├── core/
+│   │   ├── __init__.py
+│   │   ├── project.py
+│   │   └── template.py
+│   └── templates/
+│       └── task_manager/
+├── pyproject.toml
+└── README.md
