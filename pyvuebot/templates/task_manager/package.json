@@ -1,0 +1,28 @@
+{
+  "name": "taskmanager-mini-app",
+  "description": "Simple Task Manager Telegram Mini App",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "serve": "node server/index.js",
+    "vercel-build": "vite build"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "^4.0.15",
+    "express": "^4.18.2",
+    "tailwindcss": "^4.0.15",
+    "telegraf": "^4.12.2",
+    "vue": "^3.5.13"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.2.1",
+    "vite": "^6.2.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
