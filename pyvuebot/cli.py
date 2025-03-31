@@ -18,14 +18,18 @@ def cli():
 # Existing commands remain the same...
 
 
-@cli.command()
+@cli.group()
+def webhook():
+    """Manage Telegram bot webhooks."""
+    pass
+
+
+@webhook.command("set")
 @click.option("--token", help="Telegram bot token")
 @click.option("--url", help="Web app URL")
 @click.option("--path", help="Custom webhook path")
-@click.option("--delete", is_flag=True, help="Delete webhook instead of setting it")
-@click.option("--drop-pending", is_flag=True, help="Drop pending updates when deleting webhook")
-def webhook(token, url, path, delete, drop_pending):
-    """Set up or delete a Telegram bot webhook."""
+def set_webhook(token, url, path):
+    """Set up a new Telegram bot webhook."""
     webhook_manager = WebhookManager()
 
     # Check if we're in a PyVueBot project
@@ -49,17 +53,6 @@ def webhook(token, url, path, delete, drop_pending):
     # If still no token, prompt for it
     if not token:
         token = click.prompt("Telegram bot token", type=str)
-
-    # Handle delete operation
-    if delete:
-        if click.confirm("Are you sure you want to delete the webhook?", default=False):
-            result = webhook_manager.delete_webhook(token, drop_pending)
-            if result.get("ok"):
-                click.echo("✅ Webhook deleted successfully")
-            else:
-                click.echo(
-                    f"❌ Failed to delete webhook: {result.get('description')}")
-        return
 
     # Get current webhook info
     info = webhook_manager.get_webhook_info(token)
@@ -139,6 +132,120 @@ def webhook(token, url, path, delete, drop_pending):
                 click.echo(f"Warning: Could not update .env file: {e}")
     else:
         click.echo(f"❌ Failed to set up webhook: {result.get('description')}")
+
+
+@webhook.command("info")
+@click.option("--token", help="Telegram bot token")
+def webhook_info(token):
+    """Check current webhook status and configuration."""
+    webhook_manager = WebhookManager()
+
+    # Handle token
+    if not token:
+        # Try to get from .env file
+        env_path = Path.cwd() / ".env"
+        if env_path.exists():
+            with open(env_path, "r") as f:
+                for line in f:
+                    if line.strip().startswith("TELEGRAM_BOT_TOKEN="):
+                        token_value = line.split(
+                            "=", 1)[1].strip().strip('"\'')
+                        if token_value:
+                            token = token_value
+                            click.echo(f"Using bot token from .env file")
+                            break
+
+    # If still no token, prompt for it
+    if not token:
+        token = click.prompt("Telegram bot token", type=str)
+
+    # Get webhook info
+    info = webhook_manager.get_webhook_info(token)
+
+    if info.get("ok"):
+        result = info.get("result", {})
+        click.echo("📊 Webhook Information:")
+        click.echo("─" * 40)
+
+        if result.get("url"):
+            click.echo(f"URL: {result.get('url')}")
+            click.echo(
+                f"Custom certificate: {'Yes' if result.get('has_custom_certificate') else 'No'}")
+            click.echo(
+                f"Pending updates: {result.get('pending_update_count', 0)}")
+            click.echo(f"Max connections: {result.get('max_connections', 40)}")
+
+            if result.get("ip_address"):
+                click.echo(f"IP Address: {result.get('ip_address')}")
+
+            if result.get("last_error_date"):
+                import datetime
+                error_date = datetime.datetime.fromtimestamp(
+                    result.get("last_error_date"))
+                click.echo(
+                    f"Last error: {error_date} - {result.get('last_error_message', 'Unknown error')}")
+
+            click.echo("─" * 40)
+            click.echo("✅ Webhook is active")
+        else:
+            click.echo("❌ No webhook set")
+    else:
+        click.echo(f"❌ Failed to get webhook info: {info.get('description')}")
+
+
+@webhook.command("delete")
+@click.option("--token", help="Telegram bot token")
+@click.option("--drop-pending", is_flag=True, help="Drop pending updates when deleting webhook")
+def delete_webhook(token, drop_pending):
+    """Delete the current webhook."""
+    webhook_manager = WebhookManager()
+
+    # Handle token
+    if not token:
+        # Try to get from .env file
+        env_path = Path.cwd() / ".env"
+        if env_path.exists():
+            with open(env_path, "r") as f:
+                for line in f:
+                    if line.strip().startswith("TELEGRAM_BOT_TOKEN="):
+                        token_value = line.split(
+                            "=", 1)[1].strip().strip('"\'')
+                        if token_value:
+                            token = token_value
+                            click.echo(f"Using bot token from .env file")
+                            break
+
+    # If still no token, prompt for it
+    if not token:
+        token = click.prompt("Telegram bot token", type=str)
+
+    # Get current webhook info first
+    info = webhook_manager.get_webhook_info(token)
+
+    if info.get("ok") and info.get("result", {}).get("url"):
+        current_url = info["result"]["url"]
+        click.echo(f"Current webhook URL: {current_url}")
+
+        if not click.confirm("Are you sure you want to delete this webhook?", default=False):
+            click.echo("Operation cancelled.")
+            return
+
+        if drop_pending and info["result"].get("pending_update_count", 0) > 0:
+            count = info["result"].get("pending_update_count", 0)
+            click.echo(
+                f"There are {count} pending updates that will be dropped.")
+            if not click.confirm("Continue and drop pending updates?", default=False):
+                drop_pending = False
+
+    # Delete the webhook
+    result = webhook_manager.delete_webhook(token, drop_pending)
+
+    if result.get("ok"):
+        click.echo("✅ Webhook deleted successfully")
+        if drop_pending:
+            click.echo("All pending updates have been dropped")
+    else:
+        click.echo(f"❌ Failed to delete webhook: {result.get('description')}")
 
 
 if __name__ == "__main__":
