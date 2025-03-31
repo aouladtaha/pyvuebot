@@ -2,16 +2,18 @@
 from pathlib import Path
 import json
 import subprocess
-from typing import Optional
+import datetime
+from typing import Optional, Dict, Any
 from .template import TemplateManager
 
 
 class Project:
     """Manages Telegram Mini App project operations."""
 
-    def __init__(self, name: str, template: str = "task_manager"):
+    def __init__(self, name: str, template: str = "task_manager", description: str = None):
         self.name = name
         self.template = template
+        self.description = description or f"A Telegram Mini App created with PyVueBot"
         self.root_path = Path.cwd() / name
         self.config_file = "pyvuebot.json"
 
@@ -28,7 +30,11 @@ class Project:
         with config_path.open() as f:
             config = json.load(f)
 
-        project = cls(name=config["name"], template=config["template"])
+        project = cls(
+            name=config["name"],
+            template=config["template"],
+            description=config.get("description", "")
+        )
         project.root_path = current_dir  # Override root_path for existing project
         return project
 
@@ -37,12 +43,27 @@ class Project:
         if self.root_path.exists():
             raise ValueError(f"Directory already exists: {self.root_path}")
 
+        # Prepare template variables
+        variables = self._get_template_variables()
+
         template_manager = TemplateManager()
         template_manager.create_project(
             template_name=self.template,
-            project_path=self.root_path
+            project_path=self.root_path,
+            variables=variables
         )
         self._create_config()
+
+    def _get_template_variables(self) -> Dict[str, Any]:
+        """Generate template variables for substitution."""
+        return {
+            "project_name": self.name,
+            "project_description": self.description,
+            "creation_date": datetime.datetime.now().strftime("%Y-%m-%d"),
+            "creation_year": datetime.datetime.now().year,
+            "template_name": self.template,
+            # Add more variables as needed
+        }
 
     def install_dependencies(self):
         """Install project dependencies."""
@@ -92,7 +113,9 @@ class Project:
         config = {
             "name": self.name,
             "template": self.template,
-            "version": "0.1.0"
+            "description": self.description,
+            "version": "0.1.0",
+            "created_at": datetime.datetime.now().isoformat()
         }
 
         config_path = self.root_path / self.config_file
