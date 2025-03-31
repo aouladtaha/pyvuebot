@@ -1,6 +1,7 @@
 """CLI entry point for PyVueBot."""
 import click
 import os
+import shutil
 from pathlib import Path
 from .core.project import Project
 from .core.template import TemplateManager
@@ -18,7 +19,8 @@ def cli():
 @click.option("--template", help="Template to use")
 @click.option("--description", help="Project description")
 @click.option("--yes", "-y", is_flag=True, help="Skip interactive prompts and use defaults")
-def init(name, template, description, yes):
+@click.option("--force", "-f", is_flag=True, help="Force project creation even if directory exists")
+def init(name, template, description, yes, force):
     """Initialize a new Telegram Mini App project structure."""
     wizard = SetupWizard()
 
@@ -29,10 +31,24 @@ def init(name, template, description, yes):
             template=template or "task_manager",
             description=description
         )
+        config = {
+            "name": name,
+            "template": template or "task_manager",
+            "description": description,
+            "setup_env": False,
+            "env_vars": {}
+        }
     elif name and template and description:
         # All parameters provided, no need for wizard
         project = Project(name=name, template=template,
                           description=description)
+        config = {
+            "name": name,
+            "template": template,
+            "description": description,
+            "setup_env": False,
+            "env_vars": {}
+        }
     else:
         # Interactive mode - run wizard
         config = wizard.run_wizard(name)
@@ -42,41 +58,42 @@ def init(name, template, description, yes):
             description=config["description"]
         )
 
-        # Create .env file if bot token was provided
-        if config.get("bot_token"):
-            env_content = [
-                "# Bot and webhook setup",
-                f'TELEGRAM_BOT_TOKEN="{config["bot_token"]}"',
-                'WEB_APP_URL=""',
-                "",
-                "# Environment mode 'development' OR 'production'",
-                'NODE_ENV="development"',
-                ""
-            ]
-
-            if config.get("setup_database"):
-                env_content.extend([
-                    "# Supabase configs",
-                    'SUPABASE_URL=""',
-                    'SUPABASE_KEY=""',
-                    ""
-                ])
-
-            env_content.append(
-                '# Bot Link to open when Back to bot main button clicked')
-            env_content.append('VITE_TELEGRAM_BOT_LINK=""')
-
-            env_path = Path.cwd() / config["name"] / ".env"
-            os.makedirs(os.path.dirname(env_path), exist_ok=True)
+    # Check if directory exists and handle it
+    project_path = Path.cwd() / config["name"]
+    if project_path.exists():
+        if not force:
+            click.echo(f"Error: Directory already exists: {project_path}")
+            click.echo("Use --force or -f option to overwrite")
+            return
+        else:
+            # Remove existing directory if --force is used
+            click.echo(f"Removing existing directory: {project_path}")
+            shutil.rmtree(project_path)
 
     # Create the project
     project.create_structure()
 
-    # Create .env file if it doesn't exist yet and we have a bot token
-    if not yes and config.get("bot_token"):
-        env_path = project.root_path / ".env"
+    # Handle environment files
+    template_env_example = wizard.templates_dir / \
+        config["template"] / ".env.example"
+
+    # Create .env file if setup_env is True
+    if config.get("setup_env") and config.get("env_vars"):
+        env_content = []
+        for key, value in config["env_vars"].items():
+            env_content.append(f'{key}="{value}"')
+
+        env_path = project_path / ".env"
         with open(env_path, "w") as f:
             f.write("\n".join(env_content))
+        click.echo("Created .env file with your configurations")
+
+    # Copy .env.example file if it exists in the template
+    if template_env_example.exists():
+        dest_env_example = project_path / ".env.example"
+        if not dest_env_example.exists():
+            shutil.copy(template_env_example, dest_env_example)
+            click.echo("Created .env.example file")
 
     click.echo(f"✨ Project structure created: {project.name}")
     click.echo(f"📁 Use 'cd {project.name}' to go to the project directory")
