@@ -1,6 +1,6 @@
 # PyVueBot
 
-<img src="pyvuebot.png" alt="PyVueBot Logo" style="max-height: 300px;"/>
+<img src="https://raw.githubusercontent.com/venopyX/pyvuebot/refs/heads/main/pyvuebot.png" alt="PyVueBot Logo" style="max-height: 300px;"/>
 
 A modern CLI tool for creating and managing Telegram Mini Apps with Vue.js and FastAPI.
 
@@ -14,6 +14,8 @@ PyVueBot streamlines the development of Telegram Mini Apps by providing:
 - Production builds and deployment
 - Integrated Telegram webhook management
 - Vercel deployment support
+
+---
 
 ## Installation
 
@@ -55,6 +57,8 @@ pyvuebot build
 pyvuebot deploy
 ```
 
+---
+
 ## Command Reference
 
 ### Project Management
@@ -87,6 +91,8 @@ pyvuebot deploy
   - `--token` - Telegram bot token
   - `--drop-pending` - Drop pending updates
 
+---
+
 ## Templates
 
 Currently available templates:
@@ -114,6 +120,8 @@ my-telegram-app/
 ├── vercel.json             # Vercel configuration
 └── pyvuebot.json           # Project configuration
 ```
+
+---
 
 ## Configuration
 
@@ -149,6 +157,21 @@ Required environment variables:
 - `SUPABASE_KEY` - Supabase project key (if using Supabase)
 - `VITE_TELEGRAM_BOT_LINK` - Link to your Telegram bot
 
+---
+
+## Star the Repository
+
+If you find PyVueBot useful, please consider giving it a star on GitHub! Your support helps the project grow.
+
+[![GitHub Repo stars](https://img.shields.io/github/stars/venopyx/pyvuebot?style=social)](https://github.com/venopyx/pyvuebot)
+
+```bash
+# Or clone and star through GitHub CLI
+gh repo clone venopyx/pyvuebot
+gh repo star venopyx/pyvuebot
+```
+
+---
 ## Development
 
 To contribute to PyVueBot:
@@ -186,4 +209,5 @@ MIT License - see [LICENSE](LICENSE) for details
 ## Support
 
 - GitHub Issues: [Report bugs](https://github.com/venopyx/pyvuebot/issues)
+- Telegram: [@venopyx](https://t.me/venopyx)
 - Twitter: [@venopyx](https://twitter.com/venopyx)
