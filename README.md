@@ -1,5 +1,7 @@
 # PyVueBot
 
+<img src="pyvuebot.png" alt="PyVueBot Logo" style="max-height: 300px;"/>
+
 A modern CLI tool for creating and managing Telegram Mini Apps with Vue.js and FastAPI.
 
 ## Overview
