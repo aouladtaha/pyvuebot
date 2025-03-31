@@ -3,6 +3,7 @@ from pathlib import Path
 import json
 import subprocess
 import datetime
+import os
 from typing import Optional, Dict, Any
 from .template import TemplateManager
 
@@ -10,12 +11,14 @@ from .template import TemplateManager
 class Project:
     """Manages Telegram Mini App project operations."""
 
-    def __init__(self, name: str, template: str = "task_manager", description: str = None):
+    def __init__(self, name: str, template: str = "task_manager", description: str = None, **kwargs):
+        """Initialize a new project with configuration."""
         self.name = name
         self.template = template
         self.description = description or f"A Telegram Mini App created with PyVueBot"
         self.root_path = Path.cwd() / name
         self.config_file = "pyvuebot.json"
+        self.extra_config = kwargs
 
     @classmethod
     def load_current(cls) -> "Project":
@@ -36,6 +39,7 @@ class Project:
             description=config.get("description", "")
         )
         project.root_path = current_dir  # Override root_path for existing project
+        project.extra_config = config.get("config", {})
         return project
 
     def create_structure(self):
@@ -62,7 +66,7 @@ class Project:
             "creation_date": datetime.datetime.now().strftime("%Y-%m-%d"),
             "creation_year": datetime.datetime.now().year,
             "template_name": self.template,
-            # Add more variables as needed
+            **self.extra_config
         }
 
     def install_dependencies(self):
@@ -115,7 +119,8 @@ class Project:
             "template": self.template,
             "description": self.description,
             "version": "0.1.0",
-            "created_at": datetime.datetime.now().isoformat()
+            "created_at": datetime.datetime.now().isoformat(),
+            "config": self.extra_config
         }
 
         config_path = self.root_path / self.config_file
