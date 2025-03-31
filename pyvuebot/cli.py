@@ -14,9 +14,10 @@ def cli():
 @cli.command()
 @click.argument("name")
 @click.option("--template", default="task_manager", help="Template to use")
-def init(name: str, template: str):
+@click.option("--description", help="Project description")
+def init(name: str, template: str, description: str):
     """Initialize a new Telegram Mini App project structure."""
-    project = Project(name=name, template=template)
+    project = Project(name=name, template=template, description=description)
     project.create_structure()
     click.echo(f"Project structure created: {name}")
     click.echo(f"Use 'cd {name}' to go to the project directory")
