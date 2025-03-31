@@ -7,11 +7,16 @@
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
     />
     <link rel="icon" href="/favicon.ico" />
-    <title>Task Manager</title>
+    <title>{{ project_name }} - Powered by PyVueBot</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
   </head>
   <body>
     <div id="app"></div>
+    <div style="text-align: center; margin-top: 20px">
+      <h2>{{ project_name }}</h2>
+      <p>{{ project_description }}</p>
+      <p>Built with PyVueBot</p>
+    </div>
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>

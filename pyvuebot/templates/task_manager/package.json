@@ -1,6 +1,6 @@
 {
-  "name": "taskmanager-mini-app",
-  "description": "Simple Task Manager Telegram Mini App",
+  "name": "{{ project_name }}",
+  "description": "{{ project_description }}",
   "private": true,
   "version": "0.0.0",
   "type": "module",
