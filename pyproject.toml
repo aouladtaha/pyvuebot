@@ -3,6 +3,7 @@ name = "pyvuebot"
 version = "0.2.0"
 description = "CLI tool for Telegram Mini Apps"
 authors = ["Gemechis Chala <venopyx@gmail.com>"]
+readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.9"
