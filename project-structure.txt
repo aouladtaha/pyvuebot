@@ -1,12 +1,18 @@
-pyvuebot/
 ├── pyvuebot/
-│   ├── __init__.py
-│   ├── cli.py
-│   ├── core/
+│   ├── cli
+│   │   ├── commands
+│   │   │   ├── __init__,py
+│   │   │   ├── project_commands.py
+│   │   │   └── webhook_commands.py
+│   │   ├── __init__.py
+│   │   ├── main.py
+│   │   └── utils.py
+│   ├── core
 │   │   ├── __init__.py
 │   │   ├── project.py
-│   │   └── template.py
-│   └── templates/
-│       └── task_manager/
+│   │   ├── template.py
+│   │   ├── webhook.py
+│   │   └── wizard.py
+│   └── __init__.py
 ├── pyproject.toml
 └── README.md
