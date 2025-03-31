@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pyvuebot"
-version = "0.2.0"
+version = "0.2.1"
 description = "CLI tool for Telegram Mini Apps"
 authors = ["Gemechis Chala <venopyx@gmail.com>"]
 readme = "README.md"
