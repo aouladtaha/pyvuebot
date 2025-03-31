@@ -30,9 +30,17 @@ class WebhookManager:
         # Construct the full webhook URL
         webhook_url = f"{webapp_url}{webhook_path}"
 
+        # Set up parameters for the API request
+        params = {
+            "url": webhook_url,
+            "max_connections": 40,  # Default value
+            # Common update types
+            "allowed_updates": ["message", "edited_message", "callback_query"]
+        }
+
         # Make the API request to set the webhook
         api_url = f"{self.telegram_api_base}{bot_token}/setWebhook"
-        response = requests.get(api_url, params={"url": webhook_url})
+        response = requests.post(api_url, json=params)
 
         # Parse and return the response
         result = response.json()
@@ -55,8 +63,8 @@ class WebhookManager:
             raise ValueError("Bot token is required")
 
         api_url = f"{self.telegram_api_base}{bot_token}/deleteWebhook"
-        response = requests.get(
-            api_url, params={"drop_pending_updates": drop_pending})
+        params = {"drop_pending_updates": "true" if drop_pending else "false"}
+        response = requests.get(api_url, params=params)
 
         result = response.json()
         return result
